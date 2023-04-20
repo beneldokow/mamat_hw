@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAX_GRADE 100
+
 void operate(FILE *f, int grades_num);
 
 int main(int argc, char **argv) {
@@ -12,12 +14,8 @@ int main(int argc, char **argv) {
         f = stdin;
     }
     else if(argc == 2) {
-        fprintf(stderr, "Error: not enough args\n");
-                exit(1);
-    }
-    else if(argc == 3){
         f = fopen(argv[1], "r");
-        grades_num = atoi(argv[2]);
+                exit(1);
     }
     else {
         fprintf(stderr, "Too much arguments");
@@ -35,26 +33,27 @@ int main(int argc, char **argv) {
     void operate(FILE *f, int grades_num) { 
         int grade;
         int ret_val;
-        int median_num;
         int line_n = 0;
-        int median_grade;
-
-        median_num = (grades_num + 1)/2;
+        int *grades_hist = malloc(sizeof(int)*MAX_GRADE);
 
         while(1) {
-            ret_val = fscanf(f, "%d-%d\t%d", &median_grade, &grade, &grade);
+            ret_val = fscanf(f, "%d", &grade);
             if(ret_val == EOF) {
                 break;
             }
-           /* else if(ret_val != 3) {
+            else if(ret_val != 1) {
                 fprintf(stderr, "Error: not a number\n");
                 exit(1);
-            }*/
-            line_n += grade;
-            if(line_n >= median_num) {
-                break;
             }
+            else if(grade > MAX_GRADE || grade < 0) {
+                fprintf(stderr, "Error: not a legal grade\nLine number:%d\n", line_n);
+            }
+            grades_hist[grade == MAX_GRADE ? grade-1 : grade]++;
+            line_n ++;
         }
 
-        fprintf(stdout,"%d\n", median_grade);
+
+        for(int i = 0;i < (line_n+1)/2; i+=grades_hist[i])
+
+        fprintf(stdout,"%d\n", i);
     }

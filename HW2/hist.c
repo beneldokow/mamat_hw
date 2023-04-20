@@ -62,6 +62,7 @@ int main(int argc, char **argv) {
         }
 
         for(int i = 0;i < n_bins;i++){
-            fprintf(stdout,"%d-%d\t%d\n", divide_factor*i, divide_factor*(i+1), grades_hist[i]);
+            fprintf(stdout,"%d-%d\t%d\n", divide_factor*i, (i == n_bins-1) ? divide_factor*(i+1) :
+            divide_factor*(i+1)-1, grades_hist[i]);
         }
     }

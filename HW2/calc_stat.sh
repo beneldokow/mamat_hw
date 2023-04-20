@@ -23,11 +23,24 @@ mkdir $dir_name
 ./hist.exe "$file_name" > "$dir_name/histogram.txt" 
 
 ./mean.exe < "$file_name" > "$dir_name/statistics.txt"
-
-
-grades_hist=$(./hist.exe "$file_name" "100") 
-grades_num=$(cat "$file_name" | wc -l)
-
-echo "$grades_hist" | ./median.exe "-" "$grades_num" >> "$dir_name/statistics.txt"
+./median.exe "$file_name" >> "$dir_name/statistics.txt"
 ./min.exe "$file_name" >> "$dir_name/statistics.txt"
 ./max.exe "$file_name" >> "$dir_name/statistics.txt"
+
+mapfile -t grades < ./hist.exe "$file_name" "100"
+
+count_pass=0
+count_all=0
+
+for grade in "${grades[@]}"; do
+    this_grade=$(echo "$grade" | awk '{ if ($2 ~ /^[0-9]+$/) print $2 }')
+    if (( this_grade > 55 )); then
+       (( count_pass++ ))
+     fi
+    ((count_all++))
+done
+
+#echo $count_pass//$count_all >> "$dir_name/statistics.txt"
+percent=$(awk "BEGIN {printf \"%.2f\", $count_pass/$count_all * 100}")
+
+echo -e "55.00\t$count_pass\t$count_all\t100\t$percent%" >> "$dir_name/statistics.txt"
