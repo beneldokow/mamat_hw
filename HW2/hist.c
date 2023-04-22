@@ -13,6 +13,7 @@ void operate(FILE *f, int n_bins);
 int main(int argc, char **argv) {
     f = stdin;
 
+    // Parse command line arguments
     for(int i = 1; i < argc; i++){
         if(!strcmp(argv[i],"-")){
             f = stdin;
@@ -43,43 +44,43 @@ int main(int argc, char **argv) {
     }
 }
 
-    void operate(FILE *f, int n_bins) { 
-        int ret_val;
-        int grade;
-        int line_n = 1;
-        int divide_factor = MAX_GRADE/n_bins;
-        int *grades_hist = calloc(n_bins,sizeof(int));
+void operate(FILE *f, int n_bins) { 
+    int ret_val;
+    int grade;
+    int line_n = 1;
+    int divide_factor = MAX_GRADE/n_bins;
+    int *grades_hist = calloc(n_bins,sizeof(int));
 
-        if(grades_hist == NULL){
-            fprintf(stderr,"Error: data allocation failed");
+    //check if data allocation was succesful
+    if(grades_hist == NULL){
+        fprintf(stderr,"Error: data allocation failed");
+        exit(1);
+    }
+
+    // Read input grades and update histogram
+     while(1) {
+        ret_val = fscanf(f, "%d", &grade);
+        if(ret_val == EOF) {
+            break;
+        }
+        else if(ret_val != 1) {
+            fprintf(stderr, "Error: not a number\n");
             exit(1);
         }
-        
-        for(int i = 0;i < n_bins;i++){
-            grades_hist[i] = 0;
+        else if(grade > MAX_GRADE || grade < 0) {
+            fprintf(stderr, "Error: not a legal grade\nLine number:%d\n"
+            , line_n);
+            continue;
         }
-
-         while(1) {
-            ret_val = fscanf(f, "%d", &grade);
-            if(ret_val == EOF) {
-                break;
-            }
-            else if(ret_val != 1) {
-                fprintf(stderr, "Error: not a number\n");
-                exit(1);
-            }
-            else if(grade > MAX_GRADE || grade < 0) {
-                fprintf(stderr, "Error: not a legal grade\nLine number:%d\n", line_n);
-                continue;
-            }
-            grades_hist[grade == MAX_GRADE ? (grade-1)/divide_factor : (grade)/divide_factor]++;
-            line_n++;
-        }
-
-        for(int i = 0;i < n_bins;i++){
-            fprintf(stdout,"%d-%d\t%d\n", divide_factor*i, (i == n_bins-1) ? divide_factor*(i+1) :
-            divide_factor*(i+1)-1, grades_hist[i]);
-        }
-
-        free(grades_hist);
+        grades_hist[grade == MAX_GRADE ? (grade-1)/divide_factor :
+        (grade)/divide_factor]++;
+        line_n++;
     }
+
+    for(int i = 0;i < n_bins;i++){
+        fprintf(stdout,"%d-%d\t%d\n", divide_factor*i, (i == n_bins-1) ? 
+        divide_factor*(i+1) : divide_factor*(i+1)-1, grades_hist[i]);
+    }
+
+    free(grades_hist);
+}
