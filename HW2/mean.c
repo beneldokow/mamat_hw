@@ -8,6 +8,7 @@ void operate(FILE *f);
 
 int main(int argc, char **argv) {
     FILE *f;
+    int ret;
 
     if( argc == 1 || !strcmp("-",argv[1]) ) {
         f = stdin;
@@ -21,18 +22,28 @@ int main(int argc, char **argv) {
     }
 
     if(!f) {
-        fprintf(stderr, "File not found: \"%s\"\n", argv[1]);
+        fprintf(stderr, "File not found:\"%s\"\n", argv[1]);
         return 1;
     }
 
     operate(f);
+
+    if(f != stdin){
+        ret = fclose(f);
+        if(ret){
+            printf("Error: file failed to close");
+            f = NULL;
+            return 1;
+        }
+    }
 }
 
     void operate(FILE *f) { 
         int grade;
         int ret_val;
         double avg = 0;
-        int line_n = 0;
+        int count = 0;
+        int line_n = 1;
 
         while(1) {
             ret_val = fscanf(f, "%d", &grade);
@@ -44,11 +55,11 @@ int main(int argc, char **argv) {
                 exit(1);
             }
             else if(grade > MAX_GRADE || grade < 0) {
-                fprintf(stderr, "Error: not a legal grade\nLine number:%d", line_n);
+                fprintf(stderr, "Error: not a legal grade\nLine number:%d\n", line_n);
                 continue;
             }
             avg += grade;
-            line_n++;
+            count++;line_n++;
         }
-        fprintf(stdout,"%.2lf\n", avg/line_n);
+        fprintf(stdout,"%.2lf\n", avg/count);
     }

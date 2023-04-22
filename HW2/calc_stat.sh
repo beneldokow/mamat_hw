@@ -22,25 +22,13 @@ mkdir $dir_name
 
 ./hist.exe "$file_name" > "$dir_name/histogram.txt" 
 
-./mean.exe < "$file_name" > "$dir_name/statistics.txt"
-./median.exe "$file_name" >> "$dir_name/statistics.txt"
-./min.exe "$file_name" >> "$dir_name/statistics.txt"
-./max.exe "$file_name" >> "$dir_name/statistics.txt"
+echo -ne "$(./mean.exe "$file_name")\t" >> "$dir_name/statistics.txt"
+echo -ne "$(./median.exe "$file_name")\t" >> "$dir_name/statistics.txt"
+echo -ne "$(./min.exe "$file_name")\t" >> "$dir_name/statistics.txt"
+echo -ne "$(./max.exe "$file_name")\t" >> "$dir_name/statistics.txt"
 
-mapfile -t grades < ./hist.exe "$file_name" "100"
+sum_all=$(./hist.exe "$file_name" -n_bins 100 | awk '{s+=$NF} END {print s}')
+sum_pass=$(./hist.exe "$file_name" -n_bins 100 | tail -n 45 | awk '{ sum += $NF } END { print sum }')
+percentage=$(($sum_pass * 100 / $sum_all))
 
-count_pass=0
-count_all=0
-
-for grade in "${grades[@]}"; do
-    this_grade=$(echo "$grade" | awk '{ if ($2 ~ /^[0-9]+$/) print $2 }')
-    if (( this_grade > 55 )); then
-       (( count_pass++ ))
-     fi
-    ((count_all++))
-done
-
-#echo $count_pass//$count_all >> "$dir_name/statistics.txt"
-percent=$(awk "BEGIN {printf \"%.2f\", $count_pass/$count_all * 100}")
-
-echo -e "55.00\t$count_pass\t$count_all\t100\t$percent%" >> "$dir_name/statistics.txt"
+echo -e "$percentage%\t" >> "$dir_name/statistics.txt"

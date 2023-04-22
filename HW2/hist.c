@@ -5,47 +5,61 @@
 #define DEFAULT_N_BINS 10
 #define MAX_GRADE 100
 
+static FILE* f;
+static int n_bins = DEFAULT_N_BINS;
+
 void operate(FILE *f, int n_bins);
 
 int main(int argc, char **argv) {
-    FILE *f;
-    int n_bins = DEFAULT_N_BINS;
+    f = stdin;
 
-    if( argc == 1 || !strcmp("-",argv[1]) ) {
-        f = stdin;
+    for(int i = 1; i < argc; i++){
+        if(!strcmp(argv[i],"-")){
+            f = stdin;
+        }
+        else if(!strcmp(argv[i],"-n_bins")){
+            n_bins = (i < argc - 1) ? atoi(argv[i+1]) : DEFAULT_N_BINS;
+            i++;
+        }
+        else{
+            f = fopen(argv[i], "r");
+            if(!f) {
+                fprintf(stderr, "File not found:\"%s\"\n", argv[1]);
+                return 1;
+            }
+        }
     }
-    else if(argc == 2) {
-        f = fopen(argv[1], "r");
-    }
-    else if (argc == 3){
-        f = fopen(argv[1], "r");
-        n_bins = atoi(argv[2]);
-    }
-    else {
-        fprintf(stderr, "Too much arguments");
-        return 1;
-    }
-
-    if(!f) {
-        fprintf(stderr, "File not found: \"%s\"\n", argv[1]);
-        return 1;
-    }
-
+   
+    int ret;
     operate(f, n_bins);
+
+    if(f != stdin){
+        ret = fclose(f);
+        if(ret){
+            fprintf(stderr, "Error: file failed to close");
+            f = NULL;
+            return 1;
+        }
+    }
 }
 
     void operate(FILE *f, int n_bins) { 
         int ret_val;
         int grade;
-        int line_n = 0;
+        int line_n = 1;
         int divide_factor = MAX_GRADE/n_bins;
-        int *grades_hist = malloc(sizeof(int)*n_bins);
+        int *grades_hist = calloc(n_bins,sizeof(int));
+
+        if(grades_hist == NULL){
+            fprintf(stderr,"Error: data allocation failed");
+            exit(1);
+        }
         
         for(int i = 0;i < n_bins;i++){
             grades_hist[i] = 0;
         }
 
-        while(1) {
+         while(1) {
             ret_val = fscanf(f, "%d", &grade);
             if(ret_val == EOF) {
                 break;
@@ -56,6 +70,7 @@ int main(int argc, char **argv) {
             }
             else if(grade > MAX_GRADE || grade < 0) {
                 fprintf(stderr, "Error: not a legal grade\nLine number:%d\n", line_n);
+                continue;
             }
             grades_hist[grade == MAX_GRADE ? (grade-1)/divide_factor : (grade)/divide_factor]++;
             line_n++;
@@ -65,4 +80,6 @@ int main(int argc, char **argv) {
             fprintf(stdout,"%d-%d\t%d\n", divide_factor*i, (i == n_bins-1) ? divide_factor*(i+1) :
             divide_factor*(i+1)-1, grades_hist[i]);
         }
+
+        free(grades_hist);
     }
