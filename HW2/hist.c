@@ -19,8 +19,14 @@ int main(int argc, char **argv) {
             f = stdin;
         }
         else if(!strcmp(argv[i],"-n_bins")){
-            n_bins = (i < argc - 1) ? atoi(argv[i+1]) : DEFAULT_N_BINS;
-            i++;
+             if(i < argc - 1){
+                char *check_file = argv[i+1];
+                int len = strlen(check_file);
+                if((len < 4)||strcmp(check_file+len-4,".txt") != 0){
+                    n_bins = atoi(argv[i+1]);
+                    i++;
+                }
+             }
         }
         else{
             f = fopen(argv[i], "r");

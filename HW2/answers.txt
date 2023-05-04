@@ -1,0 +1,5 @@
+1. We reused a very large amount of code, a lot of code that checks the success/failure of functions, calls and argument checks, etc.
+
+2. It depends on the ability of the random function to produce random inputs with a uniform distribution.
+We tried checking for several sizes of inputs to examine histograms and saw that we were getting closer and closer to
+approaching a uniform distribution as we took a larger sampling data but didnt get to a completely uniform distribution.
