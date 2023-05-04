@@ -3,7 +3,7 @@
 // Function to create a new node
 pnode_t new_node(elem_t data)
 {
-    pnode_t node = malloc(sizeof(pnode_t));
+    pnode_t node = (pnode_t)malloc(sizeof(struct node));
     if(node == NULL){
         return NULL;
     }
@@ -16,7 +16,7 @@ pnode_t new_node(elem_t data)
 // Function to create a new stack
 pstack_t stack_create(size_t max_num_of_elem, clone_t clone_func_t, destroy_t destroy_func_t, print_t print_func_t)
 {
-    pstack_t stack = malloc(sizeof(struct stack));
+    pstack_t stack = (pstack_t)malloc(sizeof(struct stack));
     
     if(stack == NULL){
         return NULL;
@@ -52,8 +52,8 @@ Result stack_push(pstack_t s, elem_t e)
     if (s == NULL || s->size >= s->capacity)
         return FAIL;
 
-    pnode_t node = new_node(e);
-    if(node = NULL){
+    pnode_t node = new_node(s->clone_func(e));
+    if(node == NULL){
         return FAIL;
     }
     
@@ -93,7 +93,7 @@ elem_t stack_peek(pstack_t s)
     if (s == NULL || s->top == NULL)
         return NULL;
 
-    return s->top;
+    return s->top->data;
 }
 
 // Function to get the size of the stack

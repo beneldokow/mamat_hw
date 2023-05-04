@@ -11,7 +11,7 @@ typedef struct student {
 }*pstudent_t, student_t;
 
 elem_t student_clone (elem_t e);
-void student_destroy(pstudent_t ps);
-void student_print(pstudent_t ps);
+void student_destroy(elem_t e);
+void student_print(elem_t e);
 
 #endif /* __STUDENT__ */ 
