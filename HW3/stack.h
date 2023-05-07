@@ -28,7 +28,8 @@ typedef struct stack{
     print_t print_func;
 } *pstack_t, stack_t;
 
-pstack_t stack_create(size_t max_num_of_elem, clone_t clone_func_t, destroy_t destroy_func_t, print_t print_func_t);
+pstack_t stack_create(size_t max_num_of_elem, clone_t clone_func_t,
+destroy_t destroy_func_t, print_t print_func_t);
 
 /**
  * @fn void stack_destroy(pstack_t s);

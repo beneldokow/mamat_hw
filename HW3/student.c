@@ -4,6 +4,9 @@
 
 
 elem_t student_clone(elem_t e) {
+    if(e == NULL){
+        return NULL;
+    }
     pstudent_t ps = (pstudent_t)e;
     pstudent_t new_ps = (pstudent_t)malloc(sizeof(student_t));
     if (new_ps == NULL) {
@@ -30,6 +33,9 @@ void student_destroy(elem_t e) {
 }
 
 void student_print(elem_t e) {
+    if(e == NULL){
+        return;
+    }
     pstudent_t ps = (pstudent_t)e;
     printf("student name: %s, age: %d, id: %d.\n", ps->name, ps->age, ps->id);
 }
