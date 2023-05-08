@@ -20,7 +20,7 @@ for url in $list; do
         count+=$(echo "$data" | grep -o "$name" | wc -l)
     done
     
-    #if no name shows printing -
+    #if no name shows printing "-"
     if [ $count -eq 0 ]; then
         echo "-" >> results.csv
     

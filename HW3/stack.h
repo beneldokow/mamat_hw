@@ -14,19 +14,7 @@ typedef elem_t (*clone_t)(elem_t e);
 typedef void (*destroy_t)(elem_t e);
 typedef void (*print_t)(elem_t e);
 
-typedef struct node {
-    elem_t data;
-    struct node *next;
-} *pnode_t, node_t;
-
-typedef struct stack{
-    pnode_t top;
-    size_t capacity;
-    size_t size;
-    clone_t clone_func;
-    destroy_t destroy_func;
-    print_t print_func;
-} *pstack_t, stack_t;
+struct stack;
 
 pstack_t stack_create(size_t max_num_of_elem, clone_t clone_func_t,
 destroy_t destroy_func_t, print_t print_func_t);

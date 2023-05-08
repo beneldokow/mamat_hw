@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
 elem_t student_clone(elem_t e) {
     if(e == NULL){
         return NULL;
@@ -17,6 +16,11 @@ elem_t student_clone(elem_t e) {
         free(new_ps);
         return NULL;
     }
+
+    if(new_ps->age < 0 || new_ps->id < 0){
+        return NULL;
+    }
+
     strcpy(new_ps->name, ps->name);
     new_ps->age = ps->age;
     new_ps->id = ps->id;
