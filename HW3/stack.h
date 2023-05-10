@@ -15,7 +15,7 @@ typedef void (*destroy_t)(elem_t e);
 typedef void (*print_t)(elem_t e);
 
 struct stack;
-
+typedef struct stack *pstack_t;
 /**
 *@fn pstack_t stack_create(size_t max_num_of_elem, clone_t clone_func_t,
 *destroy_t destroy_func_t, print_t print_func_t)
