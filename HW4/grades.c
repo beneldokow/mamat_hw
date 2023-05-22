@@ -29,6 +29,12 @@ void course_destroy(void* course);
 int student_clone(void *student, void **output);
 void student_destroy(void* student);
 
+/**
+ * @brief clones a course struct.
+ * @param course - the course to clone.
+ * @param[out] output - points to pointer to the new course.
+ * @return 0 on success, 1 on failure.
+ */
 int course_clone(void *course,void **output) {
     if (course == NULL) {
         return 1;
@@ -41,7 +47,7 @@ int course_clone(void *course,void **output) {
     pcourse_t new_course = (pcourse_t)malloc(sizeof(struct course));
     
     if (new_course == NULL) {
-        course_destroy(new_course);
+        course_destroy((void*)new_course);
         return 1;
     }
 
@@ -49,7 +55,7 @@ int course_clone(void *course,void **output) {
     new_course->grade = c->grade;
 
     if (new_course->course_name == NULL) {
-        course_destroy(new_course);
+        course_destroy((void*)new_course);
         return 1;
     }
 
@@ -59,6 +65,10 @@ int course_clone(void *course,void **output) {
     return 0;
 }
 
+/**
+ * @brief destroys a course struct.
+ * @param course - the course to destroy.
+ */
 void course_destroy(void* course) {
     if (course == NULL) {
         return;
@@ -68,6 +78,12 @@ void course_destroy(void* course) {
     free(course);
 }
 
+/**
+ * @brief clones a student struct.
+ * @param student - the student to clone.
+ * @param[out] output - points to pointer to the new student.
+ * @return 0 on success, 1 on failure.
+ */
 int student_clone(void* student,void **output) {
   
     if(student == NULL) {
@@ -80,10 +96,10 @@ int student_clone(void* student,void **output) {
         return 1;
     }
 
-    pstudent_t new_student = malloc(sizeof(struct student));
+    pstudent_t new_student = (pstudent_t)malloc(sizeof(struct student));
     
     if (new_student == NULL) {
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
@@ -91,7 +107,7 @@ int student_clone(void* student,void **output) {
     new_student->name = (char*)malloc(strlen(s->name) + 1);
     
     if(new_student->name == NULL){
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
@@ -105,32 +121,32 @@ int student_clone(void* student,void **output) {
     }
 
     if(!list_push_front(new_student->courses,list_get(it_student))){
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
     struct iterator *it_new_student = list_begin(s->courses);
     if(it_new_student == NULL && list_size(s->courses) != 0){
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
     
     for(int i = 1; i < list_size(s->courses); i++){
         if(!list_insert(new_student->courses,it_new_student, list_get(it_student))){
-            student_destroy(new_student);
+            student_destroy((void*)new_student);
             return 1;
         }
 
         it_student = list_next(it_student);
         it_new_student = list_next(it_new_student);
         if(it_student == NULL || it_new_student == NULL){
-            student_destroy(new_student);
+            student_destroy((void*)new_student);
             return 1;
         }
     }
     
     if (new_student->name == NULL || new_student->courses == NULL) {
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
@@ -138,6 +154,10 @@ int student_clone(void* student,void **output) {
     return 0;
 }
 
+/**
+ * @brief destroys a student struct.
+ * @param student - the student to destroy.
+ */
 void student_destroy(void* student) {
     if (student == NULL) {
         return;
@@ -179,9 +199,9 @@ int grades_add_student(struct grades *grades, const char *name, int id) {
         return 1;
     }
 
-    struct student *new_student = malloc(sizeof(struct student));
+    pstudent_t new_student = (pstudent_t)malloc(sizeof(struct student));
     if (new_student == NULL) {
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
@@ -190,7 +210,7 @@ int grades_add_student(struct grades *grades, const char *name, int id) {
     new_student->courses = list_init(course_clone, course_destroy);
 
     if (new_student->name == NULL || new_student->courses == NULL) {
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
@@ -198,22 +218,24 @@ int grades_add_student(struct grades *grades, const char *name, int id) {
 
     struct iterator *it = list_begin(grades->students);
     if(list_size(grades->students) != 0 && it == NULL){
-        student_destroy(new_student);
+        student_destroy((void*)new_student);
         return 1;
     }
 
     while (it != NULL) {
         pstudent_t current = list_get(it);
         if (current->id == id) {
-            student_destroy(new_student);
+            student_destroy((void*)new_student);
             return 1;
         }
         it = list_next(it);
     }
 
     if(!list_push_front(grades->students, new_student)){
+        student_destroy((void*)new_student);
         return 0;
     }
+    student_destroy((void*)new_student);
     return 1;
 }
 
@@ -240,9 +262,9 @@ int grades_add_grade(struct grades *grades, const char *name, int id, int grade)
 
         if (current->id == id) {
             
-            pcourse_t new_course = malloc(sizeof(struct course));
+            pcourse_t new_course = (pcourse_t)malloc(sizeof(struct course));
             if (new_course == NULL) {
-                course_destroy(new_course);
+                course_destroy((void*)new_course);
                 return 1;
             }
 
@@ -250,39 +272,41 @@ int grades_add_grade(struct grades *grades, const char *name, int id, int grade)
             new_course->grade = grade;
 
             if (new_course->course_name == NULL) {
-                course_destroy(new_course);
+                course_destroy((void*)new_course);
                 return 1;
             }
             strcpy(new_course->course_name, name);
 
             struct iterator *course_it = list_begin(current->courses);
             if (course_it == NULL && list_size(current->courses) != 0) {
-                course_destroy(new_course);
+                course_destroy((void*)new_course);
                 return 1;
             }
 
             for(int i = 0; i < list_size(current->courses); i++){  
                 pcourse_t current_course = list_get(course_it);
                 if(current_course == NULL){
-                    course_destroy(new_course);
+                    course_destroy((void*)new_course);
                     return 1;
                 }
                 if(strcmp(current_course->course_name, name) == 0){
-                    course_destroy(new_course);
+                    course_destroy((void*)new_course);
                     return 1;
                 }
                 course_it = list_next(course_it);
             }
             
             if(!list_push_front(current->courses, new_course)){
+                course_destroy((void*)new_course);
                 return 0;
             }
 
-            course_destroy(new_course);
+            course_destroy((void*)new_course);
             return 1;
         }
         it = list_next(it);
     }
+
     return 1;
 }
 
