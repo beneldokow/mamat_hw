@@ -342,7 +342,7 @@ float grades_calc_avg(struct grades *grades, int id, char **out){
             if(list_size(current->courses) == 0){
                 *out = (char*) malloc(strlen(current->name) + 1);
                 strcpy(*out, current->name);
-                return SUCCESS;
+                return 0;
             }
             float sum = 0;
             int count = 0;
