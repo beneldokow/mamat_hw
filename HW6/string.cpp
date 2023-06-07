@@ -22,7 +22,9 @@ String :: ~String() {
 
 String& String :: operator=(const String &rhs) {
     if (this != &rhs) {
-        delete[] data;
+        if(data != NULL){
+            delete[] data;
+        }
         length = rhs.length;
         data = new char[length + 1];
         strcpy(data, rhs.data);
@@ -31,7 +33,9 @@ String& String :: operator=(const String &rhs) {
 }
 
 String& String :: operator=(const char *str) {
-    delete[] data;
+    if(data != NULL){
+        delete[] data;
+    }
     length = strlen(str);
     data = new char[length + 1];
     strcpy(data, str);
@@ -48,7 +52,13 @@ bool String :: equals(const char *rhs) const {
 
 void String :: split(const char *delimiters, String **output, size_t *size) const {
     char *str = new char[length + 1];
+    if(data == NULL){
+        return;
+    }
     strcpy(str, data);
+    if(delimiters == NULL){
+        return;
+    }
     char *token = strtok(str, delimiters);
     if(size != NULL){
         *size = 0;
@@ -70,26 +80,24 @@ void String :: split(const char *delimiters, String **output, size_t *size) cons
 }
 
 int String :: to_integer() const {
-    int num = 0;
-    for (int i = 0; i < (int)length; i++) {
-        num *= 10;
-        num += data[i] - '0';
+    if(data == NULL){
+        return -1;
     }
-    return num;
+    return atoi(data);
 }
 
-String String :: trim() const {
+String String::trim() const {
     int start = 0;
     while (data[start] == ' ') {
         start++;
     }
     int end = length - 1;
-    while (data[end] == ' ') {
+    while (end >= start && data[end] == ' ') {
         end--;
     }
 
     char *str = new char[end - start + 2];
-    strcpy(str, data + start);
+    strncpy(str, data + start, end - start + 1);
     str[end - start + 1] = '\0';
     String s(str);
     delete[] str;

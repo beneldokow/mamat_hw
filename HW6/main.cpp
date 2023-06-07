@@ -1,10 +1,10 @@
 #include "ip.h"
 #include "port.h"
 
-extern int check_args(int argc, char const **argv);
+extern int check_args(int argc, char **argv);
 extern void parse_input(GenericField &field);
 
-int main(int argc, char const **argv){
+int main(int argc, char **argv){
     
     if(check_args(argc, argv)){
         return 1;
@@ -16,42 +16,44 @@ int main(int argc, char const **argv){
     const char *dst_port = "dst-port";
 
     String entry_rule = argv[1];
-    entry_rule.trim();
+    entry_rule = entry_rule.trim();
 
-    String **rule = new String*[2];
+    String **rule = new String*;
     size_t *size = new size_t;
-    const char *delim = " =";
+    const char *delim = "=";
 
     entry_rule.split(delim, rule, size);
-    rule[0]->trim();
-    rule[1]->trim();
+    
+    (*rule)[0] = (*rule)[0].trim();
+    (*rule)[1] = (*rule)[1].trim();
 
-    if(rule[0]->equals(src_ip)){
+    if((*rule)[0].equals(src_ip)){
         Ip::dst_ip = false;
         Ip ip;
-        ip.set_value(*rule[1]);
+        ip.set_value((*rule)[1]);
         parse_input(ip);
     }
-    else if(rule[0]->equals(dst_ip)){
+    else if((*rule)[0].equals(dst_ip)){
         Ip::dst_ip = true;
         Ip ip;
-        ip.set_value(*rule[1]);
+        ip.set_value((*rule)[1]);
         parse_input(ip);
     }
-    else if(rule[0]->equals(src_port)){
+    else if((*rule)[0].equals(src_port)){
         Port::dst_port = false;
         Port port;
-        port.set_value(*rule[1]);
+        port.set_value((*rule)[1]);
         parse_input(port);
     }
-    else if(rule[0]->equals(dst_port)){
+    else if((*rule)[0].equals(dst_port)){
         Port::dst_port = true;
         Port port;
-        port.set_value(*rule[1]);
+        port.set_value((*rule)[1]);
         parse_input(port);
     }
 
-    delete[] rule;
+    delete[] *rule;
+    delete rule;
     delete size;
 
     return 0;

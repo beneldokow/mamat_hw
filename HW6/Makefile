@@ -1,24 +1,24 @@
 CXX=g++
-CXXFLAGS=-std=c++11 -g -Wall -c
+CXXFLAGS=-std=c++11 -g -Wall
 CXXLINK=g++
 
-firewall.exe : main.o libinput.so libfirewall.so
-	$(CXXLINK) -o firewall.exe ip.o port.o string.o main.o -L. -linput -lfirewall
-
-main.o : main.cpp ip.h port.h
-	$(CXX) $(CXXFLAGS) main.cpp
+firewall.exe : main.o libfirewall.so
+	$(CXXLINK) ip.o port.o string.o main.o -o firewall.exe -L. -linput -L. -lfirewall
 
 libfirewall.so : ip.o port.o string.o
-	$(CXXLINK) -shared -o libfirewall.so ip.o port.o string.o
+	$(CXXLINK) -shared ip.o port.o string.o -o libfirewall.so
 
-ip.o : ip.cpp ip.h generic-field.h string.h
-	$(CXX) $(CXXFLAGS) -fPIC ip.cpp
+main.o : main.cpp ip.h port.h string.cpp
+	$(CXX) $(CXXFLAGS) -c -fPIC main.cpp
 
-port.o : port.cpp port.h generic-field.h string.h
-	$(CXX) $(CXXFLAGS) -fPIC port.cpp
+ip.o : ip.cpp ip.h string.cpp
+	$(CXX) $(CXXFLAGS) -c -fPIC ip.cpp
 
-string.o : string.cpp string.h
-	$(CXX) $(CXXFLAGS) -fPIC string.cpp
+port.o : port.cpp port.h string.cpp
+	$(CXX) $(CXXFLAGS) -c -fPIC port.cpp
+
+string.o : string.cpp
+	$(CXX) $(CXXFLAGS) -c -fPIC string.cpp
 
 clean:
-	rm -f *.o *.exe
+	rm -f *.o *.exe libfirewall.so
