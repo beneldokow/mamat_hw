@@ -5,18 +5,26 @@ int Ip::ip_mask = 0;
 int Ip::ip_rule[IP_SIZE] = {0};
 
 bool Ip::match(String packet) {
+
+    // if the packet is empty, return false
     if(packet.equals("")){
         return false;
     }
+
+    // split the packet to different fields
     packet = packet.trim();
     const char *delim = ",";
     String **ip = new String*;
     size_t *size = new size_t;
     packet.split(delim, ip, size);
+    if (*size == 0) {
+        return false;
+    }
 
     String *relevant_ip = new String;
     const char *target;
 
+    // assign the relevant ip
     if(Ip::dst_ip){
         target = "dst-ip";
     }
@@ -28,6 +36,7 @@ bool Ip::match(String packet) {
     String **check = new String*;
     size_t *size_check = new size_t;
 
+    //get the relevant ip field
     for(int i = 0; i < (int)*size; i++){
         (*ip)[i] = (*ip)[i].trim();
         (*ip)[i].split(eq_delim, check, size_check);
@@ -48,9 +57,13 @@ bool Ip::match(String packet) {
     const char *pt_delim = ".";
     String **relevant_ip_split = new String*;
     size_t *size_relevant_ip = new size_t;
+  
+    // split the relevant ip to its fields
     (*relevant_ip).split(pt_delim, relevant_ip_split, size_relevant_ip);
 
     int mask = Ip::ip_mask;
+
+    // check if the ip fields are corresponding to the rule
     for(int i = 0; i < IP_SIZE; i++){
         if(mask > 0){
             if(ip_rule[i] != ((*relevant_ip_split)[i]).to_integer()){
@@ -78,11 +91,17 @@ bool Ip::set_value(String value) {
     String **mask = new String*;
     size_t *size = new size_t; 
 
+    //split the ip to the different fields
     value.split(delim_ip, ip, size);
+    if(*size == 0){
+        return false;
+    }
 
+    //split the mask from the last field
     (*ip)[3].split(delim_mask, mask, size);
     (*ip)[3] = (*mask)[0];
 
+    //check if the ip fields are valid
     for(int i = 0; i < IP_SIZE; i++) {
         if ((*ip)[i].to_integer() < 0 || (*ip)[i].to_integer() > 255) {
             delete[] *ip;
@@ -94,6 +113,7 @@ bool Ip::set_value(String value) {
         }
     }
 
+    //check if the mask is valid
     if((*mask)[1].to_integer() < 0 || (*mask)[1].to_integer() > 32) {
         delete[] *ip;
         delete ip;
@@ -103,6 +123,7 @@ bool Ip::set_value(String value) {
         return false;
     }
     
+    //set the ip rule and mask
     for(int i = 0; i < IP_SIZE; i++) {
         ip_rule[i] = (*ip)[i].to_integer();
     }

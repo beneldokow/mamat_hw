@@ -1,25 +1,47 @@
 #include "string.h"
 #include <cstring>
 
+/**
+ * @brief Construct a new String object
+ * @return empty String object.
+*/
 String :: String() : data(NULL) ,length(0) {
 }
 
+/**
+ * @brief Construct a new String object
+ * @param str - String object to copy.
+ * @return copied String object.
+*/
 String :: String(const String &str) {
     length = str.length;
     data = new char[length + 1];
     strcpy(data, str.data);
 }
 
+/**
+ * @brief Construct a new String object
+ * @param str - char* to copy.
+ * @return copied String object.
+*/
 String :: String(const char *str) {
     length = strlen(str);
     data = new char[length + 1];
     strcpy(data, str);
 }
 
+/**
+ * @brief Destroy the String object
+*/
 String :: ~String() {
     delete[] data;
 }
 
+/**
+ * @brief set the String object to be equal to the given String object.
+ * @param rhs - String object to copy.
+ * @return copied String object.
+*/
 String& String :: operator=(const String &rhs) {
     if (this != &rhs) {
         if(data != NULL){
@@ -32,6 +54,11 @@ String& String :: operator=(const String &rhs) {
     return *this;
 }
 
+/**
+ * @brief set the String object to be equal to the given char*.
+ * @param str - char* to copy.
+ * @return copied String object.
+*/
 String& String :: operator=(const char *str) {
     if(data != NULL){
         delete[] data;
@@ -42,14 +69,30 @@ String& String :: operator=(const char *str) {
     return *this;
 }
 
+/**
+ * @brief compare two String objects.
+ * @param rhs - String object to compare to.
+ * @return true if the two String objects are equal, false otherwise.
+*/
 bool String :: equals(const String &rhs) const {
     return strcmp(data, rhs.data) == 0;
 }
 
+/**
+ * @brief compare two String objects.
+ * @param rhs - char* to compare to.
+ * @return true if the two String objects are equal, false otherwise.
+*/
 bool String :: equals(const char *rhs) const {
     return strcmp(data, rhs) == 0;
 }
 
+/**
+ * @brief split the String object by the given delimiters.
+ * @param delimiters - ptr to delimiters to split by.
+ * @param output - ptr to array of String objects to store the split String objects.
+ * @param size - ptr to size_t to store the size of the output array.
+*/
 void String :: split(const char *delimiters, String **output, size_t *size) const {
     char *str = new char[length + 1];
     if(data == NULL){
@@ -79,6 +122,10 @@ void String :: split(const char *delimiters, String **output, size_t *size) cons
     delete[] str;
 }
 
+/**
+ * @brief turn the String object to an integer.
+ * @return the integer value of the String object.
+*/
 int String :: to_integer() const {
     if(data == NULL){
         return -1;
@@ -86,6 +133,10 @@ int String :: to_integer() const {
     return atoi(data);
 }
 
+/**
+ * @brief remove all spaces from the beginning and end of String object.
+ * @return the trimmed String object.
+ */
 String String::trim() const {
     int start = 0;
     while (data[start] == ' ') {

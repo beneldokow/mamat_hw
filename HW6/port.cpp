@@ -1,5 +1,6 @@
 #include "port.h"
 
+//default values
 bool Port::dst_port = false;
 int Port::min_port_rule = 0;
 int Port::max_port_rule = 0;
@@ -8,16 +9,23 @@ bool Port::match(String packet) {
     if(packet.equals("")){
         return false;
     }
-    packet = packet.trim();
+    packet = packet.trim(); //remove spaces from the start/end of the string
     const char *delim = ",";
     String **port = new String*;
     size_t *size = new size_t;
-    packet.split(delim, port, size);
+
+    packet.split(delim, port, size); //split the packet to the different fields
+    if (*size == 0) {
+        delete[] *port;
+        delete port;
+        delete size;
+        return false;
+    }
 
     String relevant_port;
     const char *target;
 
-    if(Port::dst_port){
+    if(Port::dst_port){ //assign the relevant port
         target = "dst-port";
     }
     else{
@@ -28,7 +36,7 @@ bool Port::match(String packet) {
     String **check = new String*;
     size_t *size_check = new size_t;
 
-    for(int i = 0; i < (int)*size; i++){
+    for(int i = 0; i < (int)*size; i++){ //find the relevant port
         (*port)[i] = (*port)[i].trim();
         if((*port)[i].equals("")){
             break;
@@ -50,7 +58,9 @@ bool Port::match(String packet) {
     delete port;
     delete size;
 
-    if(relevant_port.to_integer() < min_port_rule || relevant_port.to_integer() > max_port_rule){
+    //check if the port is in the range and return the result
+    if(relevant_port.to_integer() < min_port_rule || 
+    relevant_port.to_integer() > max_port_rule){
         return false;
     }
 
@@ -62,6 +72,7 @@ bool Port::set_value(String value) {
     String **port = new String*;
     size_t *size = new size_t; 
 
+    //split the value to the min and max port
     value.split(delim, port, size);
     if (*size != 2) {
         delete[] *port;
@@ -70,6 +81,7 @@ bool Port::set_value(String value) {
         return false;
     }
 
+    //check if the port rules are valid
     if((*port)[0].to_integer() < 0 || (*port)[0].to_integer() > 65535 ||
        (*port)[1].to_integer() < 0 || (*port)[1].to_integer() > 65535 ||
        (*port)[0].to_integer() > (*port)[1].to_integer()) {
@@ -79,6 +91,7 @@ bool Port::set_value(String value) {
         return false;
     }
 
+    //assign the port rules
     min_port_rule = (*port)[0].to_integer();
     max_port_rule = (*port)[1].to_integer();
 
